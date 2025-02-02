@@ -1,0 +1,9 @@
+{
+    "Reference": "weapon_famas",
+    "Abilities": {
+        "Regeneration": {
+            "Amount": 5.0,
+            "Interval": 2.0
+        }
+    }
+}

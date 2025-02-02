@@ -1,0 +1,9 @@
+{
+    "Reference": "weapon_deagle",
+    "Abilities": {
+        "Vampire": {
+            "Amount": 5.0,
+            "AmountHead": 10.0
+        }
+    }
+}
