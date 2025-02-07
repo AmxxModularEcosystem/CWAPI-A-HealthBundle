@@ -10,21 +10,21 @@ new T_WeaponAbility:iAbility = Invalid_WeaponAbility;
 
 enum S_RegenerationData {
     bool:Regen_Enabled,
-    Float:Regen_Amount,
+    Float:Regen_AmountHealth,
     Float:Regen_Interval,
-    // Float:Regen_Max,
+    Regen_AmountArmor,
 }
 new PlayerRegenerationData[MAX_PLAYERS + 1][S_RegenerationData];
 
 public CWAPI_OnLoad() {
-    register_plugin("[CWAPI-A] Regeneration", "1.0.0", "ArKaNeMaN");
+    register_plugin("[CWAPI-A] Regeneration", "1.1.0", "ArKaNeMaN");
 
     iAbility = CWAPI_Abilities_Register(ABILITY_NAME);
 
     CWAPI_Abilities_AddParams(iAbility,
-        "Amount", "Float", true,
-        "Interval", "Float", true
-        // "Max", "Float", false
+        "Interval", "Float", true,
+        "Health", "Float", false,
+        "Armor", "Integer", false
     );
     CWAPI_Abilities_AddEventListener(iAbility, CWeapon_OnDeploy, "@OnDeploy");
     CWAPI_Abilities_AddEventListener(iAbility, CWeapon_OnHolster, "@OnHolster");
@@ -54,11 +54,14 @@ public client_disconnected(playerIndex) {
 
 EnablePlayerRegenFromParams(const playerIndex, const Trie:p) {
     PlayerRegenerationData[playerIndex][Regen_Enabled] = true;
-    TrieGetCell(p, "Amount", PlayerRegenerationData[playerIndex][Regen_Amount]);
+
+    PlayerRegenerationData[playerIndex][Regen_AmountHealth] = 0.0;
+    TrieGetCell(p, "Health", PlayerRegenerationData[playerIndex][Regen_AmountHealth]);
+
+    PlayerRegenerationData[playerIndex][Regen_AmountArmor] = 0;
+    TrieGetCell(p, "Armor", PlayerRegenerationData[playerIndex][Regen_AmountArmor]);
+
     TrieGetCell(p, "Interval", PlayerRegenerationData[playerIndex][Regen_Interval]);
-    
-    // PlayerRegenerationData[playerIndex][Regen_Max] = get_entvar(playerIndex, var_max_health);
-    // TrieGetCell(p, "Max", PlayerRegenerationData[playerIndex][Regen_Max]);
 
     set_task(PlayerRegenerationData[playerIndex][Regen_Interval], "@Task_Regenerate", playerIndex, .flags = "b");
 }
@@ -74,5 +77,39 @@ DisablePlayerRegen(const playerIndex) {
         return;
     }
     
-    ExecuteHamB(Ham_TakeHealth, playerIndex, PlayerRegenerationData[playerIndex][Regen_Amount], DMG_GENERIC);
+    if (PlayerRegenerationData[playerIndex][Regen_AmountHealth] != 0.0) {
+        ExecuteHamB(Ham_TakeHealth, playerIndex, PlayerRegenerationData[playerIndex][Regen_AmountHealth], DMG_GENERIC);
+    }
+    
+    if (PlayerRegenerationData[playerIndex][Regen_AmountArmor] != 0.0) {
+        rg_add_user_armor(playerIndex, PlayerRegenerationData[playerIndex][Regen_AmountArmor]);
+    }
+}
+
+rg_add_user_armor(const playerIndex, const armor, const ArmorType:type = ARMOR_KEVLAR, const maxArmor = 100) {
+    new ArmorType:curType;
+    new curArmor = rg_get_user_armor(playerIndex, curType);
+
+    if (_:curType < _:type) {
+        curType = type;
+    }
+
+    new addArmor = armor;
+    if (
+        (addArmor > 0 && curArmor > maxArmor)
+        || (addArmor < 0 && curArmor < 0)
+    ) {
+        addArmor = 0;
+        return;
+    }
+
+    if (curArmor + addArmor > maxArmor) {
+        addArmor = maxArmor - curArmor;
+    }
+
+    if (curArmor + addArmor < 0) {
+        addArmor = -curArmor;
+    }
+    
+    rg_set_user_armor(playerIndex, curArmor + addArmor, curType);
 }

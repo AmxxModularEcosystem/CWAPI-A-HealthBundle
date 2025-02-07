@@ -2,8 +2,12 @@
     "Reference": "weapon_deagle",
     "Abilities": {
         "Vampire": {
-            "Amount": 5.0,
-            "AmountHead": 10.0
+            "Amount": 5.0, // +5 хп за обычное убийство
+            "AmountHead": 10.0 // +10 хп за убийство в голову
+        },
+        "VampireArmor": {
+            "Amount": 5.0, // +5 брони за обычное убийство
+            "AmountHead": 10.0 // +10 брони за убийство в голову
         }
     }
 }
