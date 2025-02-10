@@ -11,7 +11,7 @@ new T_WeaponAbility:iAbility = Invalid_WeaponAbility;
 new T_WeaponAbility:iAbilityArmor = Invalid_WeaponAbility;
 
 public CWAPI_OnLoad() {
-    register_plugin("[CWAPI-A] Vampire", "1.0.0", "ArKaNeMaN");
+    register_plugin("[CWAPI-A] Vampire", "1.1.0", "ArKaNeMaN");
 
     iAbility = CWAPI_Abilities_Register(ABILITY_NAME);
     CWAPI_Abilities_AddParams(iAbility,
